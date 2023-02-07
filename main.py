@@ -11,7 +11,8 @@ logs = []
 # get the environment variables
 library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "library"
 path_to_docs = os.environ["INPUT_DOCS_PATH"]  # "docs"
-nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  # "\n      - 'ConnectorsGetInsertedHere': ''"
+nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  #ConnectorsGetInsertedHere
+connectors_tile_replacement_placeholder = "#connectors_tile_replacement"
 readme_destination = os.environ["INPUT_README_DEST"]  # "docs/docs/library_readmes/connectors"
 
 
@@ -31,6 +32,7 @@ class File:
 class LibrayJsonFile(File):
     readme_path = ''
     json = ''
+    short_description = ''
 
 
 def get_files(source_dir, search_pattern) -> List[File]:
@@ -141,7 +143,8 @@ def build_nav_dict(library_files: List[LibrayJsonFile]):
         lib_id = library_files.json["libraryItemId"]
         nav[lib_id] = {
             "name": library_files.json["name"],
-            "readme": library_files.readme_docs_path
+            "readme": library_files.readme_docs_path,
+            "short_description": library_files.json["shortDescription"]
         }
     return nav
 
@@ -165,13 +168,41 @@ def build_nav(nav_dict, section_title):
     return nav_replacement_lines
 
 
+def build_landing_page(nav_dict, section_title):
+    nav_replacement_lines = []
+
+    line = '<div class ="grid cards" markdown >'
+    nav_replacement_lines.append(line)
+
+    for n in nav_dict:
+        path_to_readme = nav_dict[n]["readme"].replace("docs/", "")
+        name = nav_dict[n]['name']
+        nav_replacement_lines.append(f"")
+        nav_replacement_lines.append(f" - __{name}__")
+        nav_replacement_lines.append(f"")
+        nav_replacement_lines.append(f"     ---")
+        nav_replacement_lines.append(f"")
+        nav_replacement_lines.append(f"     {nav_dict[n]['short_description']}")
+        nav_replacement_lines.append(f"")
+        nav_replacement_lines.append(f"     [:octicons-arrow-right-24: {name}](../../{path_to_readme})")
+
+    nav_replacement_lines.append("</div>")
+    return nav_replacement_lines
+
+
 def gen_nav_replacement(tech_readmes, section_title, tag, tag_value):
     tagged_items = get_item_by_tag(tech_readmes, tag, tag_value)
     nav_dict = build_nav_dict(tagged_items)
     return build_nav(nav_dict, section_title)
 
 
-def update_nav(nav_file_path, find_text, replacement_text):
+def gen_landing_page_replacement(tech_readmes, section_title, tag, tag_value):
+    tagged_items = get_item_by_tag(tech_readmes, tag, tag_value)
+    nav_dict = build_nav_dict(tagged_items)
+    return build_landing_page(nav_dict, section_title)
+
+
+def update_file(nav_file_path, find_text, replacement_text):
     with open(nav_file_path, 'r') as file:
         file_data = file.read()
     file_data = file_data.replace(find_text, replacement_text)
@@ -234,8 +265,28 @@ def main():
         # join with new line
         n = "\n".join(nav_replacement)
         log(f"Nav replacement string: {n}")
+        update_file(nav_files[0].full_path, nav_replacement_placeholder, "\n".join(nav_replacement))
 
-        update_nav(nav_files[0].full_path, nav_replacement_placeholder, "\n".join(nav_replacement))
+        # generate landing page tiles
+        sources_landing_page_content = ["## Sources"]
+        destinations_landing_page_content = ["\n\n## Destinations"]
+
+        sources_landing_page_content.extend(gen_landing_page_replacement(tech_readmes, "Sources", "Pipeline Stage", "Source"))
+        destinations_landing_page_content.extend(gen_landing_page_replacement(tech_readmes, "Destinations", "Pipeline Stage", "Destination"))
+        landing_page_content = sources_landing_page_content
+        landing_page_content.extend(destinations_landing_page_content)
+
+        # get the connectors index file
+        path = path_to_docs + "/docs/platform/connectors"
+        files = get_files(path, 'index.md')
+        if len(files) == 0:
+            log("index.md not found")
+            raise Exception(f"index.md not found in {path}")
+
+        log(f"Yaml file path: {files[0].full_path}")
+
+        update_file(files[0].full_path, connectors_tile_replacement_placeholder, "\n".join(landing_page_content))
+
 
     except Exception as e:
         print(f"Error: {traceback.print_exc()}")

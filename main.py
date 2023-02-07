@@ -277,7 +277,7 @@ def main():
         landing_page_content.extend(destinations_landing_page_content)
 
         # get the connectors index file
-        path = path_to_docs + "/docs/platform/connectors"
+        path = path_to_docs + "/platform/connectors"
         files = get_files(path, 'index.md')
         if len(files) == 0:
             log("index.md not found")

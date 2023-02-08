@@ -276,8 +276,26 @@ def main():
         landing_page_content = sources_landing_page_content
         landing_page_content.extend(destinations_landing_page_content)
 
+
+
+        path = path_to_docs + "/docs"
+        log(f"{path} files")
+        for f in Path(path).iterdir():
+            log(f"\n{f}")
+
         # get the connectors index file
-        path = path_to_docs + "/platform/connectors"
+        path = path_to_docs + "/docs/platform"
+        log(f"{path} files")
+        for f in Path(path).iterdir():
+            log(f"\n{f}")
+
+        # get the connectors index file
+        path = path_to_docs + "/docs/platform/connectors"
+        log(f"{path} files")
+        for f in Path(path).iterdir():
+            log(f"\n{f}")
+
+
         files = get_files(path, 'index.md')
         if len(files) == 0:
             log("index.md not found")

@@ -216,6 +216,7 @@ def set_action_output(name: str, value: str):
 
 
 def log(message):
+    print(message)
     logs.append(message)
 
 
@@ -277,20 +278,24 @@ def main():
         landing_page_content.extend(destinations_landing_page_content)
 
 
+        path = "docs"
+        log(f"{path} files")
+        for f in Path(path).iterdir():
+            log(f"\n{f}")
 
-        path = path_to_docs + "/docs"
+        path = "docs/docs"
         log(f"{path} files")
         for f in Path(path).iterdir():
             log(f"\n{f}")
 
         # get the connectors index file
-        path = path_to_docs + "/docs/platform"
+        path = "docs/docs/platform"
         log(f"{path} files")
         for f in Path(path).iterdir():
             log(f"\n{f}")
 
         # get the connectors index file
-        path = path_to_docs + "/docs/platform/connectors"
+        path = "docs/docs/platform/connectors"
         log(f"{path} files")
         for f in Path(path).iterdir():
             log(f"\n{f}")

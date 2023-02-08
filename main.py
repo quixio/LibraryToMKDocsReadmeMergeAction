@@ -283,19 +283,14 @@ def main():
         for f in Path(path).iterdir():
             log(f"\n{f}")
 
-        path = "docs/docs"
+        # get the connectors index file
+        path = "docs/platform"
         log(f"{path} files")
         for f in Path(path).iterdir():
             log(f"\n{f}")
 
         # get the connectors index file
-        path = "docs/docs/platform"
-        log(f"{path} files")
-        for f in Path(path).iterdir():
-            log(f"\n{f}")
-
-        # get the connectors index file
-        path = "docs/docs/platform/connectors"
+        path = "docs/platform/connectors"
         log(f"{path} files")
         for f in Path(path).iterdir():
             log(f"\n{f}")

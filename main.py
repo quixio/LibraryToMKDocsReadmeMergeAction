@@ -226,7 +226,7 @@ def main():
         library_file_dictionary = get_files(library_repo_path, 'library.json')
 
         # filter library files down to specific tag and value
-        tech_connector_library_files = get_library_item_with_tag(library_file_dictionary, "type", "Tech connectors")
+        tech_connector_library_files = get_library_item_with_tag(library_file_dictionary, "type", "Connectors")
 
         # get readme's for those library items, filtering on tag and value
         tech_readmes = get_named_files_associated_with_library_file(tech_connector_library_files, "readme.md", "*.md")

@@ -315,7 +315,7 @@ def update_connectors_landing_page(tech_connector_representation):
     sources_landing_page_items.extend(destinations_landing_page_items)
 
     # get the connectors index file
-    path = "docs/docs/platform/connectors"
+    path = "docs/platform/connectors"
 
     connectors_index_file = get_file(path, "index.md")
 

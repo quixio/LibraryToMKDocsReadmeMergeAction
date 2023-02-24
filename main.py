@@ -334,6 +334,7 @@ def update_connectors_landing_page(tech_connector_representation):
                 padding = ''
                 padding += ' ' * spacer
                 print(padding + n.name)
+                log(padding + n.name)
                 if(n.name == "index.md") and "connectors" in n.path:
                     cb(n.path)
             if n.is_dir():

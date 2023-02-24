@@ -342,9 +342,18 @@ def update_connectors_landing_page(tech_connector_representation):
         object.close()
 
     def set_path(s):
-        update_file(s, connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
+        print("***found it here " + s)
+        log("***found it here " + s)
+
 
     scan("docs", 0, set_path)
+
+    log(f"index.md should be in: docs/platform/connectors/index.md")
+    if os.path.exists("docs/platform/connectors/index.md"):
+        print("***it exists!")
+        log("***it exists!")
+
+    update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
 
 
 def main():

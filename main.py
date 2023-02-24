@@ -5,8 +5,15 @@ from pathlib import Path
 import json
 from typing import List
 
-
+connectors_md_path = ''
 logs = []
+
+# library_repo_path = "library"
+# path_to_docs = "docs"
+# nav_replacement_placeholder = "#ConnectorsGetInsertedHere"
+# connectors_tile_replacement_placeholder = "#connectors_tile_replacement"
+# readme_destination = "docs/docs/library_readmes/connectors"
+# CONNECTOR_TAG = "Connectors"
 
 # get the environment variables
 library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "library"
@@ -316,10 +323,27 @@ def update_connectors_landing_page(tech_connector_representation):
 
     # get the connectors index file
     path = "docs/platform/connectors"
+    log(f"Looking for index.md in: {path}")
 
-    connectors_index_file = get_file(path, "index.md")
+    #brute force to find the connector index.md file!
+    def scan(d, spacer, cb):
+        object = os.scandir(d)
+        
+        for n in object :
+            if n.is_dir() or n.is_file():
+                padding = ''
+                padding += ' ' * spacer
+                print(padding + n.name)
+                if(n.name == "index.md") and "connectors" in n.path:
+                    cb(n.path)
+            if n.is_dir():
+                scan(n, spacer + 4, cb)
+        object.close()
 
-    update_file(connectors_index_file, connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
+    def set_path(s):
+        update_file(s, connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
+
+    scan("docs", 0, set_path)
 
 
 def main():

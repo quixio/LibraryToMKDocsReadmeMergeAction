@@ -105,6 +105,7 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
 
     # private function to remove existing file
     def remove_file_if_exists(file_path):
+        log(f"{file_path} exists. Removing..")
         if os.path.exists(file_path):
             os.remove(file_path)
 
@@ -112,6 +113,14 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
     def copy_file(file_source, file_dest):
         log(f"Copying from [{file_source}] to [{file_dest}]")
         shutil.copy2(file_source, file_dest)
+
+    def check_dir_exists(dir):
+        if not os.path.exists(dir):
+                raise Exception(f"{dir} not found")
+    
+    def check_file_exists(file):
+        if not os.path.exists(file):
+                raise Exception(f"{file} not found")
 
     # for each identified connector:
     for connector in connector_descriptors:
@@ -124,6 +133,9 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
         try:
 
             # copy the files to the dest dir
+
+            check_dir_exists(target_dir)
+            
             copy_file(connector.readme_file_path, f"{target_dir}/{new_readme_filename}")
 
             # update the connector with the new file paths
@@ -132,13 +144,18 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
             if connector.has_icon:
                 new_icon_filename = (replace_chr(f"{connector.title}-{suffix(connector)}-") + connector.icon_file).lower()
                 remove_file_if_exists(new_icon_filename)
+
+                check_dir_exists(target_dir)
+                check_file_exists(connector.icon_file_path)
                 copy_file(connector.icon_file_path, f"{target_dir}/{new_icon_filename}")
+
                 connector.icon_file_path = f"{target_dir}/{new_icon_filename}"
                 log(f"Connector [{connector.name}] icon path is {connector.icon_file_path}")
 
-
         except Exception as e:
-            pass
+            log("###########################")
+            log(f"Error copy files.. " + e)
+            log("###########################")
 
 
 def get_file_path(path, file_name, search_pattern):
@@ -190,6 +207,7 @@ def get_library_item_with_tag(files: List[File], tag: str, tag_value: str) -> Li
 
 
 def build_nav_dict(library_files: List[LibraryJsonFile], is_source=False, is_destination=False):
+    log("Building nav dictionary")
     nav = {}
     for library_file in library_files:
         if library_file.is_source == is_source and library_file.is_destination == is_destination:
@@ -200,6 +218,7 @@ def build_nav_dict(library_files: List[LibraryJsonFile], is_source=False, is_des
                 "short_description": library_file.description,
                 "icon": library_file.icon_file_path
             }
+            log(f"NavItem={nav[lib_id]}")
     return nav
 
 
@@ -235,8 +254,8 @@ def build_landing_page(nav_dict, section_title):
         name = nav_dict[n]['name']
         path_to_readme = nav_dict[n]["readme"].replace("docs/", "").replace(".md", ".html")
         path_to_icon = nav_dict[n]["icon"].replace("docs/", "")
-        log(f"readme={path_to_readme}")
-        log(f"icon={path_to_icon}")
+        log(f" readme={path_to_readme}")
+        log(f" icon={path_to_icon}")
         nav_replacement_lines.append(f"<li>")
         nav_replacement_lines.append(f"<div style='display:flex'>")
         if path_to_icon != "":
@@ -315,10 +334,13 @@ def add_connectors_to_navigation(tech_connector_representation):
 
 
 def update_connectors_landing_page(tech_connector_representation):
+    log("Building connectors landing page")
     
+    log("Sources...")
     sources = build_nav_dict(tech_connector_representation, is_source=True)
     sources_landing_page_items = build_landing_page(sources, "Sources")
 
+    log("Destinations...")
     destinations = build_nav_dict(tech_connector_representation, is_destination=True)
     destinations_landing_page_items = build_landing_page(destinations, "Destinations")
 

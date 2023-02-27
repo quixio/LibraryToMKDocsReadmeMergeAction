@@ -8,20 +8,20 @@ from typing import List
 connectors_md_path = ''
 logs = []
 
-# library_repo_path = "library"
-# path_to_docs = ""
-# nav_replacement_placeholder = "#ConnectorsGetInsertedHere"
-# connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
-# readme_destination = "docs/library_readmes/connectors"
-# CONNECTOR_TAG = "Connectors"
-
-# get the environment variables
-library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "library"
-path_to_docs = os.environ["INPUT_DOCS_PATH"]  # "docs"
-nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  #ConnectorsGetInsertedHere
+library_repo_path = "library"
+path_to_docs = ""
+nav_replacement_placeholder = "#ConnectorsGetInsertedHere"
 connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
-readme_destination = os.environ["INPUT_README_DEST"]  # "docs/docs/library_readmes/connectors"
+readme_destination = ""# = "docs/library_readmes/connectors"
 CONNECTOR_TAG = "Connectors"
+
+# # get the environment variables
+# library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "library"
+# path_to_docs = os.environ["INPUT_DOCS_PATH"]  # "docs"
+# nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  #ConnectorsGetInsertedHere
+# connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
+# readme_destination = os.environ["INPUT_README_DEST"]  # "docs/docs/library_readmes/connectors"
+# CONNECTOR_TAG = "Connectors"
 
 class File:
     name = ''
@@ -32,7 +32,7 @@ class File:
     def __init__(self, name, path):
         self.name = name
         self.path = path
-        self.full_path = "{}/{}".format(self.path, self.name)
+        self.full_path =  os.path.join(self.path, self.name)
         pass
 
 
@@ -89,6 +89,10 @@ def replace_chr(value):
     return "".join(found)
 
 
+def use_fwd_slash(s):
+    return s.replace("\\", "//")
+
+
 def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
     if not os.path.exists(target_dir + "/"):
         log(f"copy_files:: {target_dir} does not exist. Creating..")
@@ -107,7 +111,12 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
     def remove_file_if_exists(file_path):
         log(f"{file_path} exists. Removing..")
         if os.path.exists(file_path):
-            os.remove(file_path)
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                log("###########################")
+                log(f"Error deleting file file: " + e)
+                log("###########################")
 
     # private function to copy a file
     def copy_file(file_source, file_dest):
@@ -136,10 +145,10 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
 
             check_dir_exists(target_dir)
             
-            copy_file(connector.readme_file_path, f"{target_dir}/{new_readme_filename}")
+            copy_file(connector.readme_file_path, os.path.join(target_dir, new_readme_filename))
 
             # update the connector with the new file paths
-            connector.readme_file_path = f"{target_dir}/{new_readme_filename}"
+            connector.readme_file_path = os.path.join(target_dir, new_readme_filename)
 
             if connector.has_icon:
                 new_icon_filename = (replace_chr(f"{connector.title}-{suffix(connector)}-") + connector.icon_file).lower()
@@ -147,14 +156,14 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
 
                 check_dir_exists(target_dir)
                 check_file_exists(connector.icon_file_path)
-                copy_file(connector.icon_file_path, f"{target_dir}/{new_icon_filename}")
+                copy_file(use_fwd_slash(connector.icon_file_path), os.path.join(target_dir, new_icon_filename))
 
-                connector.icon_file_path = f"{target_dir}/{new_icon_filename}"
+                connector.icon_file_path = os.path.join(target_dir, new_icon_filename)
                 log(f"Connector [{connector.name}] icon path is {connector.icon_file_path}")
 
         except Exception as e:
             log("###########################")
-            log(f"Error copy files.. " + e)
+            log(f"Error copy files:" + e)
             log("###########################")
 
 
@@ -190,12 +199,14 @@ def get_library_item_with_tag(files: List[File], tag: str, tag_value: str) -> Li
                 
                 if icon_file != "":
                     f.icon_file = icon_file
-                    f.icon_file_path = f"{file.path}\{icon_file}"
+                    #f.icon_file_path = f"{file.path}/{icon_file}"
+                    f.icon_file_path = os.path.join(file.path, icon_file)
                     f.has_icon = True
 
                 f.readme_file_path = get_file_path(file.path, "readme.md", "*.md")
                 f.is_source = get_json_value(json_data, "tags")['Pipeline Stage'][0] == "Source"
                 f.is_destination = get_json_value(json_data, "tags")['Pipeline Stage'][0] == "Destination"
+                log(f"Connector [{f.title}], IconFilePath={f.icon_file_path}. ReadmePath={f.readme_file_path}")
 
                 # todo remove
                 f.json = json_data
@@ -234,7 +245,7 @@ def build_nav(nav_dict, section_title):
     log(line)
     nav_replacement_lines.append(line)
     for n in nav_dict:
-        path_to_readme = nav_dict[n]["readme"].replace("docs/", "")
+        path_to_readme = nav_dict[n]["readme"].replace("docs" + os.sep, "")
         line = f"{spaces}  - '{nav_dict[n]['name']}': '{path_to_readme}'"
         log(line)
         nav_replacement_lines.append(line)
@@ -252,8 +263,8 @@ def build_landing_page(nav_dict, section_title):
 
     for n in nav_dict:
         name = nav_dict[n]['name']
-        path_to_readme = nav_dict[n]["readme"].replace("docs/", "").replace(".md", ".html")
-        path_to_icon = nav_dict[n]["icon"].replace("docs/", "")
+        path_to_readme = nav_dict[n]["readme"].replace("docs" + os.sep, "").replace(".md", ".html")
+        path_to_icon = nav_dict[n]["icon"].replace("docs" + os.sep, "")
         log(f" readme={path_to_readme}")
         log(f" icon={path_to_icon}")
         nav_replacement_lines.append(f"<li>")
@@ -354,7 +365,8 @@ def update_connectors_landing_page(tech_connector_representation):
 
     #log(f"#################################\nLanding page replacement text = \n\n{landing_page_replacement_text}\n#################################")
 
-    update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, landing_page_replacement_text)
+    fp = os.path.join("docs", "platform", "connectors", "index.md")
+    update_file(fp, connectors_tile_replacement_placeholder, landing_page_replacement_text)
 
 
 def log_file_structure(starting_directory = ""):
@@ -386,6 +398,8 @@ def log_file_structure(starting_directory = ""):
 
 def main():
     try:
+
+        readme_destination = os.path.join("docs", "library_readmes", "connectors")
 
         # find library.json files
         library_file_dictionary = get_files(library_repo_path, 'library.json')

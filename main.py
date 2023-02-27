@@ -328,7 +328,7 @@ def update_connectors_landing_page(tech_connector_representation):
 
     landing_page_replacement_text = "\n".join(sources_landing_page_items)
 
-    log(f"#################################\nLanding page replacement text = \n\n{landing_page_replacement_text}\n#################################")
+    #log(f"#################################\nLanding page replacement text = \n\n{landing_page_replacement_text}\n#################################")
 
     update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, landing_page_replacement_text)
 

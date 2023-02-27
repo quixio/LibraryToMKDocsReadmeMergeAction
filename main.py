@@ -235,6 +235,8 @@ def build_landing_page(nav_dict, section_title):
         name = nav_dict[n]['name']
         path_to_readme = nav_dict[n]["readme"].replace("docs/", "").replace(".md", ".html")
         path_to_icon = nav_dict[n]["icon"].replace("docs/", "")
+        log(f"readme={path_to_readme}")
+        log(f"icon={path_to_icon}")
         nav_replacement_lines.append(f"<li>")
         nav_replacement_lines.append(f"<div style='display:flex'>")
         if path_to_icon != "":

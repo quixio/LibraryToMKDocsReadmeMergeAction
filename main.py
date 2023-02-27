@@ -9,17 +9,17 @@ connectors_md_path = ''
 logs = []
 
 # library_repo_path = "library"
-# path_to_docs = "docs"
+# path_to_docs = ""
 # nav_replacement_placeholder = "#ConnectorsGetInsertedHere"
-# connectors_tile_replacement_placeholder = "#connectors_tile_replacement"
-# readme_destination = "docs/docs/library_readmes/connectors"
+# connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
+# readme_destination = "docs/library_readmes/connectors"
 # CONNECTOR_TAG = "Connectors"
 
 # get the environment variables
 library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "library"
 path_to_docs = os.environ["INPUT_DOCS_PATH"]  # "docs"
 nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  #ConnectorsGetInsertedHere
-connectors_tile_replacement_placeholder = "#connectors_tile_replacement"
+connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
 readme_destination = os.environ["INPUT_README_DEST"]  # "docs/docs/library_readmes/connectors"
 CONNECTOR_TAG = "Connectors"
 
@@ -89,7 +89,7 @@ def replace_chr(value):
     return "".join(found)
 
 
-def copy_files_new(connector_descriptors: List[LibraryJsonFile], target_dir):
+def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
     if not os.path.exists(target_dir + "/"):
         log(f"copy_files:: {target_dir} does not exist. Creating..")
         os.makedirs(os.path.dirname(target_dir + "/"), exist_ok=True)
@@ -126,7 +126,6 @@ def copy_files_new(connector_descriptors: List[LibraryJsonFile], target_dir):
 
             # update the connector with the new file paths
             connector.readme_file_path = f"{target_dir}/{new_readme_filename}"
-
 
             if connector.has_icon:
                 new_icon_filename = (replace_chr(f"{connector.title}-{suffix(connector)}-") + connector.icon_file).lower()
@@ -178,12 +177,12 @@ def get_library_item_with_tag(files: List[File], tag: str, tag_value: str) -> Li
                 f.is_source = get_json_value(json_data, "tags")['Pipeline Stage'][0] == "Source"
                 f.is_destination = get_json_value(json_data, "tags")['Pipeline Stage'][0] == "Destination"
 
-
                 # todo remove
                 f.json = json_data
                 found.append(f)
             except Exception as e:
                 print("error")
+                log("Error " + e)
 
     return found
 
@@ -322,38 +321,40 @@ def update_connectors_landing_page(tech_connector_representation):
     sources_landing_page_items.extend(destinations_landing_page_items)
 
     # get the connectors index file
-    path = "docs/platform/connectors"
-    log(f"Looking for index.md in: {path}")
+    # path = "docs/platform/connectors"
+    # log(f"Looking for index.md in: {path}")
 
-    #brute force to find the connector index.md file!
-    def scan(d, spacer, cb):
+    update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
+
+
+def log_file_structure(starting_directory = ""):
+    
+    def scan(d, cb, spacer = 0):
         object = os.scandir(d)
-        
+
+        # iterate all the directories and files in the specified path
         for n in object :
             if n.is_dir() or n.is_file():
                 padding = ''
                 padding += ' ' * spacer
                 print(padding + n.name)
                 log(padding + n.name)
-                if(n.name == "index.md") and "connectors" in n.path:
-                    cb(n.path)
+                #if(n.name == "index.md") and "connectors" in n.path:
+                #    cb(n.path)
             if n.is_dir():
-                scan(n, spacer + 4, cb)
+                scan(n, cb, spacer + 4)
         object.close()
 
-    def set_path(s):
+    def found_path_callback(s):
         print("***found it here " + s)
         log("***found it here " + s)
 
+    scan(starting_directory, found_path_callback)
 
-    scan("docs", 0, set_path)
-
-    log(f"index.md should be in: docs/platform/connectors/index.md")
-    if os.path.exists("docs/platform/connectors/index.md"):
-        print("***it exists!")
-        log("***it exists!")
-
-    update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
+    # log(f"index.md should be in: docs/platform/connectors/index.md")
+    # if os.path.exists("docs/platform/connectors/index.md"):
+    #     print("***it exists!")
+    #     log("***it exists!")
 
 
 def main():
@@ -366,7 +367,7 @@ def main():
         tech_connectors = get_library_item_with_tag(library_file_dictionary, "type", CONNECTOR_TAG)
 
         # copy readmes and icons to dest folder
-        copy_files_new(tech_connectors, readme_destination)
+        copy_files(tech_connectors, readme_destination)
 
         # add all connectors to the nav list in mkdocs.yaml
         add_connectors_to_navigation(tech_connectors)
@@ -377,6 +378,8 @@ def main():
     except Exception as e:
         print(f"Error: {traceback.print_exc()}")
         log(f"Error: {traceback.print_exc()}")
+
+        log_file_structure()
     finally:
         set_action_output("logs", logs)
         #print(logs)

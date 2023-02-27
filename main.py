@@ -110,6 +110,7 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
 
     # private function to copy a file
     def copy_file(file_source, file_dest):
+        log(f"Copying from [{file_source}] to [{file_dest}]")
         shutil.copy2(file_source, file_dest)
 
     # for each identified connector:
@@ -121,6 +122,7 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
         remove_file_if_exists(new_readme_filename)
 
         try:
+
             # copy the files to the dest dir
             copy_file(connector.readme_file_path, f"{target_dir}/{new_readme_filename}")
 
@@ -132,6 +134,7 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
                 remove_file_if_exists(new_icon_filename)
                 copy_file(connector.icon_file_path, f"{target_dir}/{new_icon_filename}")
                 connector.icon_file_path = f"{target_dir}/{new_icon_filename}"
+                log(f"Connector [{connector.name}] icon path is {connector.icon_file_path}")
 
 
         except Exception as e:
@@ -181,7 +184,6 @@ def get_library_item_with_tag(files: List[File], tag: str, tag_value: str) -> Li
                 f.json = json_data
                 found.append(f)
             except Exception as e:
-                print("error")
                 log("Error " + e)
 
     return found
@@ -264,8 +266,8 @@ def set_action_output(name: str, value: str):
 
 
 def log(message):
-    print(message)
-    logs.append(message)
+    print(f"\n{message}")
+    logs.append(f"\n{message}")
 
 
 def generate_nav(connectors: List[LibraryJsonFile]) -> str:
@@ -324,7 +326,11 @@ def update_connectors_landing_page(tech_connector_representation):
     # path = "docs/platform/connectors"
     # log(f"Looking for index.md in: {path}")
 
-    update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, "\n".join(sources_landing_page_items))
+    landing_page_replacement_text = "\n".join(sources_landing_page_items)
+
+    log(f"#################################\nLanding page replacement text = \n\n{landing_page_replacement_text}\n#################################")
+
+    update_file("docs/platform/connectors/index.md", connectors_tile_replacement_placeholder, landing_page_replacement_text)
 
 
 def log_file_structure(starting_directory = ""):
@@ -337,7 +343,6 @@ def log_file_structure(starting_directory = ""):
             if n.is_dir() or n.is_file():
                 padding = ''
                 padding += ' ' * spacer
-                print(padding + n.name)
                 log(padding + n.name)
                 #if(n.name == "index.md") and "connectors" in n.path:
                 #    cb(n.path)
@@ -346,14 +351,12 @@ def log_file_structure(starting_directory = ""):
         object.close()
 
     def found_path_callback(s):
-        print("***found it here " + s)
         log("***found it here " + s)
 
     scan(starting_directory, found_path_callback)
 
     # log(f"index.md should be in: docs/platform/connectors/index.md")
     # if os.path.exists("docs/platform/connectors/index.md"):
-    #     print("***it exists!")
     #     log("***it exists!")
 
 
@@ -376,13 +379,11 @@ def main():
         update_connectors_landing_page(tech_connectors)
 
     except Exception as e:
-        print(f"Error: {traceback.print_exc()}")
         log(f"Error: {traceback.print_exc()}")
 
         log_file_structure()
     finally:
         set_action_output("logs", logs)
-        #print(logs)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,12 @@ from pathlib import Path
 import json
 from typing import List
 
+## TODO
+# docs builds should clone docs repo into a subfolder for cleaner look and easier debug
+# there are some hard coded paths here, remove and add as env vars where appropriate
+# add different debug levels
+
+
 connectors_md_path = ''
 logs = []
 
@@ -45,7 +51,6 @@ class LibraryJsonFile(File):
     readme_file_path = ''
     is_source = False
     is_destination = False
-
 
     readme_path = ''
     json = ''
@@ -271,7 +276,7 @@ def build_landing_page(nav_dict, section_title):
         nav_replacement_lines.append(f"<div style='display:flex'>")
         if path_to_icon != "":
             nav_replacement_lines.append(f"<img src='../../{path_to_icon}' style='max-width:40px;border-radius:8px;'>")
-        nav_replacement_lines.append(f"<p style='min-width: 100px;'>")
+        nav_replacement_lines.append(f"<p style='min-width: 100px;margin-top:7px'>")
         nav_replacement_lines.append(f"<strong style='margin-left:9px;border-radius: 8px;'>{nav_dict[n]['name']}</strong>")
         nav_replacement_lines.append(f"</p>")
         nav_replacement_lines.append(f"</div>")
@@ -363,8 +368,6 @@ def update_connectors_landing_page(tech_connector_representation):
 
     landing_page_replacement_text = "\n".join(sources_landing_page_items)
 
-    #log(f"#################################\nLanding page replacement text = \n\n{landing_page_replacement_text}\n#################################")
-
     fp = os.path.join("docs", "platform", "connectors", "index.md")
     update_file(fp, connectors_tile_replacement_placeholder, landing_page_replacement_text)
 
@@ -395,6 +398,15 @@ def log_file_structure(starting_directory = ""):
     # if os.path.exists("docs/platform/connectors/index.md"):
     #     log("***it exists!")
 
+def sort_library_list(library_list: List[LibraryJsonFile]):
+    def get_name(json):
+        try:
+            return json.title
+        except AttributeError:
+            return 0
+
+    library_list.sort(key=get_name)
+    
 
 def main():
     try:
@@ -406,6 +418,8 @@ def main():
 
         # get details of tech connectors incl icon and readme paths
         tech_connectors = get_library_item_with_tag(library_file_dictionary, "type", CONNECTOR_TAG)
+
+        sort_library_list(tech_connectors)
 
         # copy readmes and icons to dest folder
         copy_files(tech_connectors, readme_destination)

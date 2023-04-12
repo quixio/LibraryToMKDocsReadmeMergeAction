@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 import json
 from typing import List
+import re
 
 ## TODO
 # docs builds should clone docs repo into a subfolder for cleaner look and easier debug
@@ -29,6 +30,10 @@ CONNECTOR_TAG = "Connectors"
 # readme_destination = os.environ["INPUT_README_DEST"]  # "docs/docs/library_readmes/connectors"
 # CONNECTOR_TAG = "Connectors"
 
+# for testing
+#library_repo_path = "C:\Code\Quix\GitHub\quix-library"
+
+
 class File:
     name = ''
     name = ''
@@ -49,6 +54,7 @@ class LibraryJsonFile(File):
     icon_file = ''
     has_icon = False
     readme_file_path = ''
+    base_path = ''
     is_source = False
     is_destination = False
 
@@ -136,6 +142,26 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
         if not os.path.exists(file):
                 raise Exception(f"{file} not found")
 
+    def copy_image_files(connector: LibraryJsonFile, target_dir):
+
+        # first get the images files from the current readme
+        # then copy them to the target directory
+
+        with open(connector.readme_file_path, 'r') as file:
+            file_contents = file.read()
+
+        images = re.findall("!\[.+\]\((.*?)[\?|\)]", file_contents)
+        log(f"Images found in {connector.readme_file_path} = {images}")
+
+        for image in images:
+            source_image_path = os.path.join(connector.base_path, image)
+            dest_image_path = os.path.join(target_dir, image)
+            if os.path.exists(source_image_path):
+                shutil.copy2(source_image_path, dest_image_path)
+            else:
+                log(f"{image} not found in {connector.base_path}")
+
+
     # for each identified connector:
     for connector in connector_descriptors:
         # determine new file names
@@ -151,6 +177,8 @@ def copy_files(connector_descriptors: List[LibraryJsonFile], target_dir):
             check_dir_exists(target_dir)
             
             copy_file(connector.readme_file_path, os.path.join(target_dir, new_readme_filename))
+
+            copy_image_files(connector, target_dir)
 
             # update the connector with the new file paths
             connector.readme_file_path = os.path.join(target_dir, new_readme_filename)
@@ -209,6 +237,7 @@ def get_library_item_with_tag(files: List[File], tag: str, tag_value: str) -> Li
                     f.has_icon = True
 
                 f.readme_file_path = get_file_path(file.path, "readme.md", "*.md")
+                f.base_path = file.path
                 f.is_source = get_json_value(json_data, "tags")['Pipeline Stage'][0] == "Source"
                 f.is_destination = get_json_value(json_data, "tags")['Pipeline Stage'][0] == "Destination"
                 log(f"Connector [{f.title}], IconFilePath={f.icon_file_path}. ReadmePath={f.readme_file_path}")

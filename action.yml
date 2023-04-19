@@ -1,5 +1,5 @@
-name: "Quix Library readme.md importer"
-description: "Import readmes from the Quix Library into mkdocs"
+name: "Quix Samples readme.md importer"
+description: "Import readmes from the Quix Samples into mkdocs"
 author: "Steve Rosam"
 branding:
   icon: 'book'
@@ -7,7 +7,7 @@ branding:
 inputs:
   LIBRARY_REPO_PATH:
     description: "Path to the repo"
-    default: "library"
+    default: "samples"
     required: true
   DOCS_PATH:
     description: "Path to docs"

@@ -15,7 +15,7 @@ import re
 connectors_md_path = ''
 logs = []
 
-library_repo_path = "library"
+library_repo_path = "samples"
 path_to_docs = ""
 nav_replacement_placeholder = "#ConnectorsGetInsertedHere"
 connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
@@ -23,7 +23,7 @@ readme_destination = ""# = "docs/library_readmes/connectors"
 CONNECTOR_TAG = "Connectors"
 
 # # get the environment variables
-# library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "library"
+# library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "samples"
 # path_to_docs = os.environ["INPUT_DOCS_PATH"]  # "docs"
 # nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  #ConnectorsGetInsertedHere
 # connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"

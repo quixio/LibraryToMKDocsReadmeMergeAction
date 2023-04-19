@@ -1,26 +1,26 @@
 # Python Container Action Template
 
-Quix Library readme importer.
-Import readmes from the Quix Library into MKdocs.
+Quix Samples readme importer.
+Import readmes from the Quix Samples into MKdocs.
 
 ## Usage
 
-Use to add readme.md files from Quix Library to MKDocs
+Use to add readme.md files from Quix Samples to MKDocs
 
 ### Example workflow
 
 ```yaml
-    - name: Quix Library readme importer
+    - name: Quix Samples readme importer
       uses: SteveRosam/QuixReadmeAction@Master
       with:
-        LIBRARY_REPO_PATH: "library"
+        LIBRARY_REPO_PATH: "samples"
         DOCS_PATH: ""
         REPLACEMENT_PLACEHOLDER: "#ConnectorsGetInsertedHere"
         README_DEST: "docs/library_readmes/connectors"
 ```
 
 ### Inputs
-LIBRARY_REPO_PATH: Path to where the library is cloned to. e.g. 'library'
+LIBRARY_REPO_PATH: Path to where the samples is cloned to. e.g. 'samples'
 DOCS_PATH: Path to where docs is cloned to. Likley leave blank.
 REPLACEMENT_PLACEHOLDER: The placeholder that will be replaced with the newly generated nav e.g. "#ConnectorsGetInsertedHere"
 README_DEST: Where (in the docs structure) the readme files will be copied to e.g. "docs/library_readmes/connectors"

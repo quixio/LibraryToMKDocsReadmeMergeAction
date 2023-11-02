@@ -397,7 +397,7 @@ def update_connectors_landing_page(tech_connector_representation):
 
     landing_page_replacement_text = "\n".join(sources_landing_page_items)
 
-    fp = os.path.join("docs", "platform", "connectors", "index.md")
+    fp = os.path.join("docs", "connectors", "index.md")
     update_file(fp, connectors_tile_replacement_placeholder, landing_page_replacement_text)
 
 

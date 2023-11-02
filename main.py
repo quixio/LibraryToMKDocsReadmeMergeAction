@@ -440,7 +440,7 @@ def sort_library_list(library_list: List[LibraryJsonFile]):
 def main():
     try:
 
-        readme_destination = os.path.join("docs", "library_readmes", "connectors")
+        readme_destination = os.path.join("docs", "connectors")
 
         # find library.json files
         library_file_dictionary = get_files(library_repo_path, 'library.json')

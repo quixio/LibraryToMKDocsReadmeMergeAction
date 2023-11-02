@@ -304,14 +304,14 @@ def build_landing_page(nav_dict, section_title):
         nav_replacement_lines.append(f"<li>")
         nav_replacement_lines.append(f"<div style='display:flex'>")
         if path_to_icon != "":
-            nav_replacement_lines.append(f"<img src='../../{path_to_icon}' style='max-width:40px;border-radius:8px;'>")
+            nav_replacement_lines.append(f"<img src='../{path_to_icon}' style='max-width:40px;border-radius:8px;'>")
         nav_replacement_lines.append(f"<p style='min-width: 100px;margin-top:7px'>")
         nav_replacement_lines.append(f"<strong style='margin-left:9px;border-radius: 8px;'>{nav_dict[n]['name']}</strong>")
         nav_replacement_lines.append(f"</p>")
         nav_replacement_lines.append(f"</div>")
         nav_replacement_lines.append(f"<hr>")
         nav_replacement_lines.append(f"<p>{nav_dict[n]['short_description']}</p>")
-        nav_replacement_lines.append(f"<p><a href='../../{path_to_readme}'><span class='twemoji'><svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M13.22 19.03a.75.75 0 0 0 1.06 0l6.25-6.25a.75.75 0 0 0 0-1.06l-6.25-6.25a.75.75 0 1 0-1.06 1.06l4.97 4.97H3.75a.75.75 0 0 0 0 1.5h14.44l-4.97 4.97a.75.75 0 0 0 0 1.06z' fill-rule='evenodd'></path></svg></span> {name}</a></p>")
+        nav_replacement_lines.append(f"<p><a href='../{path_to_readme}'><span class='twemoji'><svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M13.22 19.03a.75.75 0 0 0 1.06 0l6.25-6.25a.75.75 0 0 0 0-1.06l-6.25-6.25a.75.75 0 1 0-1.06 1.06l4.97 4.97H3.75a.75.75 0 0 0 0 1.5h14.44l-4.97 4.97a.75.75 0 0 0 0 1.06z' fill-rule='evenodd'></path></svg></span> {name}</a></p>")
         nav_replacement_lines.append(f"</li>")
 
     nav_replacement_lines.append("</ul></div>")

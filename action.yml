@@ -17,9 +17,17 @@ inputs:
     description: "MKDocs menu placeholder to be replaced"
     default: ""
     required: true
-  README_DEST:
-    description: "Path to readme file destination"
+  CONNECTORS_TITLE_REPLACEMENT:
+    description: "Replace connectors title"
     default: ""
+    required: false
+  CONNECTORS_TAG:
+    description: "The tag to use to locale connectors in the library"
+    default: ""
+    required: true
+  NAV_INDENT_SPACES:
+    description: "Indent the nave by this number of spaces"
+    default: "6"
     required: true
 outputs:
   logs:

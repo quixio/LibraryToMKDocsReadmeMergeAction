@@ -15,24 +15,16 @@ import re
 connectors_md_path = ''
 logs = []
 
-library_repo_path = "samples"
-path_to_docs = ""
-nav_replacement_placeholder = "#ConnectorsGetInsertedHere"
-connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
-readme_destination = ""# = "docs/library_readmes/connectors"
-CONNECTOR_TAG = "Connectors"
-
-# # get the environment variables
-# library_repo_path = os.environ["INPUT_LIBRARY_REPO_PATH"]  # "samples"
-# path_to_docs = os.environ["INPUT_DOCS_PATH"]  # "docs"
-# nav_replacement_placeholder = os.environ["INPUT_REPLACEMENT_PLACEHOLDER"]  #ConnectorsGetInsertedHere
-# connectors_tile_replacement_placeholder = "[//]: <> (#connectors_tile_replacement)"
-# readme_destination = os.environ["INPUT_README_DEST"]  # "docs/docs/library_readmes/connectors"
-# CONNECTOR_TAG = "Connectors"
+library_repo_path = os.getenv("INPUT_LIBRARY_REPO_PATH", "samples")
+path_to_docs = os.getenv("INPUT_DOCS_PATH", "")
+nav_replacement_placeholder = os.getenv("INPUT_REPLACEMENT_PLACEHOLDER", "#ConnectorsGetInsertedHere")
+connectors_tile_replacement_placeholder = os.getenv("INPUT_CONNECTORS_TITLE_REPLACEMENT", "[//]: <> (#connectors_tile_replacement)")
+readme_destination = ""
+CONNECTOR_TAG = os.getenv("INPUT_CONNECTORS_TAG", "Connectors")
+NAV_INDENTATION = int(os.getenv("INPUT_NAV_INDENT_SPACES", "6"))
 
 # for testing
 #library_repo_path = "C:\Code\Quix\GitHub\quix-library"
-
 
 class File:
     name = ''
@@ -269,7 +261,7 @@ def build_nav_dict(library_files: List[LibraryJsonFile], is_source=False, is_des
 
 def build_nav(nav_dict, section_title):
     nav_replacement_lines = []
-    nav_title_indentation = 6  # spaces
+    nav_title_indentation = NAV_INDENTATION  # spaces
     spaces = ""
     spaces += ' ' * nav_title_indentation
 

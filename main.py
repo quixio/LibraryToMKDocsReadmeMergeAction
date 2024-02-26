@@ -311,9 +311,6 @@ def build_landing_page(nav_dict, section_title):
 
 def update_file(nav_file_path, find_text, replacement_text):
 
-    log(f"Replacing {find_text} in {nav_file_path} with:")
-    log(replacement_text)
-
     with open(nav_file_path, 'r') as file:
         file_data = file.read()
     file_data = file_data.replace(find_text, replacement_text)

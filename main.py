@@ -38,7 +38,6 @@ class File:
         self.full_path =  os.path.join(self.path, self.name)
         pass
 
-
 class LibraryJsonFile(File):
     title = ''
     description = ''
@@ -311,6 +310,10 @@ def build_landing_page(nav_dict, section_title):
 
 
 def update_file(nav_file_path, find_text, replacement_text):
+
+    log(f"Replacing {find_text} in {nav_file_path} with:")
+    log(replacement_text)
+
     with open(nav_file_path, 'r') as file:
         file_data = file.read()
     file_data = file_data.replace(find_text, replacement_text)
@@ -431,6 +434,15 @@ def sort_library_list(library_list: List[LibraryJsonFile]):
 
 def main():
     try:
+        log("*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*")
+        log("Config Values:")
+        log(f"library_repo_path: {library_repo_path}")
+        log(f"path_to_docs: {path_to_docs}")
+        log(f"nav_replacement_placeholder: {nav_replacement_placeholder}")
+        log(f"connectors_tile_replacement_placeholder: {connectors_tile_replacement_placeholder}")
+        log(f"CONNECTOR_TAG: {CONNECTOR_TAG}")
+        log(f"NAV_INDENTATION: {NAV_INDENTATION}")
+        log("*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*")
 
         readme_destination = os.path.join("docs", "connectors")
 
